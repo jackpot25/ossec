@@ -1,0 +1,29 @@
+#!/bin/bash
+if [ -z $1 ] || [ "$1" == "-h" ]; then
+  echo Usage: ossec-del FQDN
+  exit 2
+fi
+
+if [ "$1" == "del" ] || [ "$1" == "rm" ] || [ "$1" == "remove" ]; then
+    shift
+fi
+
+if [ -z $1 ] || [ "$1" == "-h" ]; then
+  echo Usage: ossec-del FQDN
+  exit 2
+fi
+
+ID=$(/var/ossec/bin/syscheck_control -l | grep ": ${1}," | awk '{ print $2 }' | tr -d ,)
+
+if [ $? != 0 ]; then
+    echo Could not find $1 in list
+    exit 2
+fi
+
+results=$(printf "R\n%s\ny\nQ\n" $ID | /var/ossec/bin/manage_agents)
+
+if [ $? != 0 ]; then
+    echo Remove failed
+    exit 2
+fi
+

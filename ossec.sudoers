@@ -1,0 +1,6 @@
+www-data    ALL=(root)NOPASSWD:/usr/local/bin/ossec-add
+www-data    ALL=(root)NOPASSWD:/usr/local/bin/ossec-del
+www-data    ALL=(root)NOPASSWD:/var/ossec/bin/syscheck_control
+www-data    ALL=(root)NOPASSWD:/var/ossec/bin/rootcheck_control
+www-data    ALL=(root)NOPASSWD:/var/ossec/bin/manage_agents
+www-data    ALL=(root)NOPASSWD:/var/ossec/bin/agent_control

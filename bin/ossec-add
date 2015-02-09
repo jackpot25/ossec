@@ -1,0 +1,38 @@
+#!/bin/bash
+if [ -z $1 ] || [ "$1" == "-h" ]; then
+  echo Usage: ossec-add FQDN
+  exit 2
+fi
+
+if [ "$1" == "add" ]; then 
+    shift
+fi
+
+if [ -z $1 ] || [ "$1" == "-h" ]; then
+  echo Usage: ossec-add FQDN
+  exit 2
+fi
+
+IP=`host $1 | awk '{ print $NF }'`
+short=`echo $1 | cut -d. -f1`
+
+results=$(printf "A\n%s\n%s\n\ny\nQ\n" $1 $IP | /var/ossec/bin/manage_agents)
+
+if [ $? != 0 ]; then
+    echo "Add failed"
+    exit 2
+fi
+ID=$(/var/ossec/bin/syscheck_control -l | grep ": ${1}," | awk '{ print $2 }' | tr -d ,)
+
+if [ $? != 0 ]; then
+    echo "Could not find $1 in list"
+    exit 2
+fi
+
+printf "E\n%s\n\nQ\n" $ID | /var/ossec/bin/manage_agents | awk '/Agent key/{f=1}f' | head -2
+echo
+results=$(/usr/sbin/service ossec restart)
+
+echo "key $1 /usr/local/bin/ossec-key /etc/remctl/acl/${short}" > /etc/remctl/conf.d/${short}
+echo "host/${1}@stanford.edu" > /etc/remctl/acl/${short}
+
